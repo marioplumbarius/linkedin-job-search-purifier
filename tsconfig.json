@@ -1,0 +1,13 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "lib": ["DOM"],
+    "jsx": "react",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "allowJs": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"]
+}

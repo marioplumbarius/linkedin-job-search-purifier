@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Linkedin Job Search Purifier",
+  "description": "Firefox extension to enhance Linkedin's Job Search Results UX by purifying it with some AI power.",
+  "version": "0.0.1",
+  "icons": {
+    "64": "src/icons/logo.png"
+  },
+  "background": {
+    "scripts": ["dist/background/index.js"]
+  },
+  "host_permissions": ["*://*.linkedin.com/jobs/search/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.linkedin.com/jobs/search/*"],
+      "js": ["dist/content/index.js"]
+    }
+  ],
+  "options_ui": {
+    "page": "dist/options/index.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "mariosouzaluan@gmail.com"
+    }
+  }
+}
