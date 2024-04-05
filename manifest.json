@@ -9,6 +9,7 @@
   "background": {
     "scripts": ["dist/background/index.js"]
   },
+  "permissions": ["storage"],
   "host_permissions": ["*://*.linkedin.com/jobs/search/*"],
   "content_scripts": [
     {

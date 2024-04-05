@@ -1,24 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import browser from "webextension-polyfill";
 
 enum FormField {
   denyList = "denyList",
 }
 
-interface FormData {
-  [FormField.denyList]: string[] | undefined;
+interface Options {
+  [FormField.denyList]: string[];
 }
 
 export default function App() {
-  const [formData, setFormData] = useState<FormData>({} as FormData);
+  const [options, setOptions] = useState<Options>({
+    [FormField.denyList]: [],
+  } as Options);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  // Initializes the form with data from storage
+  useEffect(() => {
+    browser.storage.local
+      .get("options")
+      .then((data) => setOptions(data.options));
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    console.log(formData);
-  };
-
-  const handleChange = (key: string, value: any) => {
-    setFormData({ ...formData, [key]: value });
+    await browser.storage.local.set({ options: options });
   };
 
   return (
@@ -36,9 +41,12 @@ export default function App() {
           name={FormField.denyList}
           rows={4}
           cols={50}
-          value={formData[FormField.denyList]?.join("\n")}
+          value={options[FormField.denyList].join("\n")}
           onChange={(event) =>
-            handleChange(FormField.denyList, event.target.value.split("\n"))
+            setOptions({
+              ...options,
+              [FormField.denyList]: event.target.value.split("\n"),
+            })
           }
         ></textarea>
 
