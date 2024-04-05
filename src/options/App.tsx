@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 
+enum FormField {
+  denyList = "denyList",
+}
+
 interface FormData {
-  denyList: String;
+  [FormField.denyList]: string[] | undefined;
 }
 
 export default function App() {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<FormData>({} as FormData);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    console.log(formData);
+  };
+
+  const handleChange = (key: string, value: any) => {
+    setFormData({ ...formData, [key]: value });
+  };
 
   return (
     <>
-      <form>
+      <form onSubmit={handleSubmit}>
         <label>Deny List (regexp)</label>
         <br />
         <sub>
@@ -18,34 +32,17 @@ export default function App() {
         </sub>
         <br />
         <textarea
-          id="deny-list"
-          name="deny-list"
+          id={FormField.denyList}
+          name={FormField.denyList}
           rows={4}
           cols={50}
-          placeholder=""
+          value={formData[FormField.denyList]?.join("\n")}
+          onChange={(event) =>
+            handleChange(FormField.denyList, event.target.value.split("\n"))
+          }
         ></textarea>
 
         <br />
-
-        <label>Check for Visa Sponshorship?</label>
-        <input
-          id="check-for-visa-sponsorship"
-          type="checkbox"
-          name="check-for-visa-sponsorship"
-        />
-
-        <br />
-
-        <label>Match Threshold</label>
-        <input
-          id="match-threshold"
-          name="match-threshold"
-          type="range"
-          min="0"
-          max="100"
-          step="5"
-          value={1}
-        />
 
         <button type="submit">Save</button>
       </form>
