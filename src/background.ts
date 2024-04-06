@@ -1,4 +1,6 @@
 import browser from "webextension-polyfill";
+import { LinkedinDatasetFilterer, LinkedinUrnMapper } from "./linkedin";
+import { stringToRegExp } from "./util";
 
 function decodeAndParseData(decoder: TextDecoder, data: ArrayBuffer[]): any {
   let chunks = "";
@@ -19,15 +21,19 @@ async function listenForVoyagerJobsDashJobCards(
   const filter = browser.webRequest.filterResponseData(details.requestId);
   const decoder = new TextDecoder("utf-8");
   const encoder = new TextEncoder();
+  const { options } = await browser.storage.local.get("options");
+  const linkedinDatasetFilterer = new LinkedinDatasetFilterer(
+    options.denyList.map(stringToRegExp),
+    new LinkedinUrnMapper(),
+  );
 
   const data: ArrayBuffer[] = [];
   filter.ondata = (event) => data.push(event.data);
 
   filter.onstop = async () => {
-    const parsed = decodeAndParseData(decoder, data);
-    const encoded = encoder.encode(JSON.stringify(parsed));
-
-    // TODO: filter out job titles matching denyList
+    const originalDataset = decodeAndParseData(decoder, data);
+    const newDataset = await linkedinDatasetFilterer.filter(originalDataset);
+    const encoded = encoder.encode(JSON.stringify(newDataset));
 
     filter.write(encoded);
     filter.close();
@@ -40,7 +46,7 @@ browser.webRequest.onBeforeRequest.addListener(
   listenForVoyagerJobsDashJobCards,
   {
     urls: [
-      "https://www.linkedin.com/voyager/api/voyagerJobsDashJobCards?decorationId=com.linkedin.voyager.dash.deco.jobs.search.JobSearchCardsCollection-199*",
+      "https://www.linkedin.com/voyager/api/voyagerJobsDashJobCards?decorationId=com.linkedin.voyager.dash.deco.jobs.search.JobSearchCardsCollection*",
     ],
     types: ["xmlhttprequest"],
   },
