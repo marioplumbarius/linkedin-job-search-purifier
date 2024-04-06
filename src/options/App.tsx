@@ -9,21 +9,21 @@ interface Options {
   [FormField.denyList]: string[];
 }
 
+const initialOptions = { [FormField.denyList]: [] };
+
 export default function App() {
-  const [options, setOptions] = useState<Options>({
-    [FormField.denyList]: [],
-  } as Options);
+  const [options, setOptions] = useState<Options>(initialOptions);
 
   // Initializes the form with data from storage
   useEffect(() => {
-    browser.storage.local
-      .get("options")
-      .then((data) => setOptions(data.options));
+    browser.storage.local.get("options").then((data) => {
+      if (data.options) setOptions(data.options);
+    });
   }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await browser.storage.local.set({ options: options });
+    await browser.storage.local.set({ options });
   };
 
   return (
@@ -42,12 +42,12 @@ export default function App() {
           rows={4}
           cols={50}
           value={options[FormField.denyList].join("\n")}
-          onChange={(event) =>
+          onChange={(event) => {
             setOptions({
               ...options,
               [FormField.denyList]: event.target.value.split("\n"),
-            })
-          }
+            });
+          }}
         ></textarea>
 
         <br />

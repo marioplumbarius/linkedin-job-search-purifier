@@ -9,8 +9,16 @@
   "background": {
     "scripts": ["dist/background/index.js"]
   },
-  "permissions": ["storage"],
-  "host_permissions": ["*://*.linkedin.com/jobs/search/*"],
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "webRequestFilterResponse"
+  ],
+  "host_permissions": [
+    "*://*.linkedin.com/jobs/search/*",
+    "*://*.linkedin.com/voyager/api/*"
+  ],
   "content_scripts": [
     {
       "matches": ["*://*.linkedin.com/jobs/search/*"],
