@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
 
 enum FormField {
   denyList = "denyList",
@@ -13,6 +15,8 @@ const initialOptions = { [FormField.denyList]: [] };
 
 export default function App() {
   const [options, setOptions] = useState<Options>(initialOptions);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notification, setNotification] = useState<string>();
 
   // Initializes the form with data from storage
   useEffect(() => {
@@ -24,11 +28,18 @@ export default function App() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await browser.storage.local.set({ options });
+    setNotification("saved!");
+    setShowNotification(true);
+  };
+
+  const handleReset = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setOptions(initialOptions);
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} onReset={handleReset}>
         <label>Deny List (regexp)</label>
         <br />
         <sub>
@@ -48,11 +59,25 @@ export default function App() {
               [FormField.denyList]: event.target.value.split("\n"),
             });
           }}
-        ></textarea>
+        />
 
         <br />
 
-        <button type="submit">Save</button>
+        <Button variant="contained" color="primary" type="submit">
+          Save
+        </Button>
+
+        <Button variant="outlined" color="secondary" type="reset">
+          Clear
+        </Button>
+
+        <Snackbar
+          open={showNotification}
+          autoHideDuration={1000}
+          onClose={() => setShowNotification(false)}
+          message={notification}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        />
       </form>
     </>
   );
