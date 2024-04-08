@@ -9,7 +9,7 @@ enum FormField {
   companyDenyList = "companyDenyList",
 }
 
-export default function App() {
+export default function Options() {
   const [options, setOptions] = useState<ExtensionOptions>(
     DefaultExtensionOptions,
   );
