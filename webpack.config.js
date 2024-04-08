@@ -7,6 +7,7 @@ module.exports = {
     background: "./src/background.ts",
     content: "./src/content.ts",
     options: "./src/options/index.tsx",
+    popup: "./src/popup/index.tsx",
   },
   module: {
     rules: [
@@ -37,6 +38,11 @@ module.exports = {
       chunks: ["options"],
       filename: "options/index.html",
       template: "src/options/index.html",
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ["popup"],
+      filename: "popup/index.html",
+      template: "src/popup/index.html",
     }),
   ],
 };
