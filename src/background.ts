@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import { LinkedinDatasetFilterer, LinkedinUrnMapper } from "./linkedin";
 import { stringToRegExp } from "./util";
-import { ExtensionOptions } from "./dto";
+import { DefaultExtensionOptions, ExtensionOptions } from "./dto";
 
 function decodeAndParseData(decoder: TextDecoder, data: ArrayBuffer[]): any {
   let chunks = "";
@@ -22,9 +22,9 @@ async function listenForVoyagerJobsDashJobCards(
   const filter = browser.webRequest.filterResponseData(details.requestId);
   const decoder = new TextDecoder("utf-8");
   const encoder = new TextEncoder();
-  const options = await browser.storage.local
+  const options: ExtensionOptions = await browser.storage.local
     .get("options")
-    .then((data) => data.options as ExtensionOptions);
+    .then((data) => data.options || DefaultExtensionOptions);
   const linkedinDatasetFilterer = new LinkedinDatasetFilterer(
     options.denyList.titles.map(stringToRegExp),
     new LinkedinUrnMapper(),

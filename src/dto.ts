@@ -3,3 +3,7 @@ export interface ExtensionOptions {
     titles: string[];
   };
 }
+
+export const DefaultExtensionOptions: ExtensionOptions = {
+  denyList: { titles: [] },
+};
