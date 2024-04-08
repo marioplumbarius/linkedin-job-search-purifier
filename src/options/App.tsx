@@ -2,19 +2,18 @@ import React, { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
+import { ExtensionOptions } from "../dto";
 
 enum FormField {
-  denyList = "denyList",
+  titleDenyList = "titleDenyList",
 }
 
-interface Options {
-  [FormField.denyList]: string[];
-}
-
-const initialOptions = { [FormField.denyList]: [] };
+const initialOptions: ExtensionOptions = {
+  denyList: { titles: [] },
+};
 
 export default function App() {
-  const [options, setOptions] = useState<Options>(initialOptions);
+  const [options, setOptions] = useState<ExtensionOptions>(initialOptions);
   const [showNotification, setShowNotification] = useState(false);
   const [notification, setNotification] = useState<string>();
 
@@ -40,23 +39,23 @@ export default function App() {
   return (
     <>
       <form onSubmit={handleSubmit} onReset={handleReset}>
-        <label>Deny List (regexp)</label>
+        <label>Job Titles to Exclude (regexp)</label>
         <br />
-        <sub>
-          One per line. Will be applied to filter out jobs' titles matching
-          these.
-        </sub>
+        <sub>One per line.</sub>
         <br />
         <textarea
-          id={FormField.denyList}
-          name={FormField.denyList}
+          id={FormField.titleDenyList}
+          name={FormField.titleDenyList}
           rows={4}
           cols={50}
-          value={options[FormField.denyList].join("\n")}
+          value={options.denyList.titles.join("\n")}
           onChange={(event) => {
             setOptions({
               ...options,
-              [FormField.denyList]: event.target.value.split("\n"),
+              denyList: {
+                ...options.denyList,
+                titles: event.target.value.split("\n"),
+              },
             });
           }}
         />
