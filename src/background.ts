@@ -27,6 +27,7 @@ async function listenForVoyagerJobsDashJobCards(
     .then((data) => data.options || DefaultExtensionOptions);
   const linkedinDatasetFilterer = new LinkedinDatasetFilterer(
     options.denyList.titles.map(stringToRegExp),
+    options.denyList.companies.map(stringToRegExp),
     new LinkedinUrnMapper(),
   );
 

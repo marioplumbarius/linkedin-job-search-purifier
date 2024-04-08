@@ -2,18 +2,17 @@ import React, { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
-import { ExtensionOptions } from "../dto";
+import { DefaultExtensionOptions, ExtensionOptions } from "../dto";
 
 enum FormField {
   titleDenyList = "titleDenyList",
+  companyDenyList = "companyDenyList",
 }
 
-const initialOptions: ExtensionOptions = {
-  denyList: { titles: [] },
-};
-
 export default function App() {
-  const [options, setOptions] = useState<ExtensionOptions>(initialOptions);
+  const [options, setOptions] = useState<ExtensionOptions>(
+    DefaultExtensionOptions,
+  );
   const [showNotification, setShowNotification] = useState(false);
   const [notification, setNotification] = useState<string>();
 
@@ -26,6 +25,12 @@ export default function App() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // This protects readers of the local storage from processing an empty string as
+    // a valid regexp. Unfortunately when the input is empty, it's still stored as an array with a single empty string. This fixes that by converting back to an empty array.
+    if (options.denyList.titles[0] === "") options.denyList.titles = [];
+    if (options.denyList.companies[0] === "") options.denyList.companies = [];
+
     await browser.storage.local.set({ options });
     setNotification("saved!");
     setShowNotification(true);
@@ -33,7 +38,7 @@ export default function App() {
 
   const handleReset = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setOptions(initialOptions);
+    setOptions(DefaultExtensionOptions);
   };
 
   return (
@@ -55,6 +60,29 @@ export default function App() {
               denyList: {
                 ...options.denyList,
                 titles: event.target.value.split("\n"),
+              },
+            });
+          }}
+        />
+
+        <br />
+
+        <label>Companies to Exclude (regexp)</label>
+        <br />
+        <sub>One per line.</sub>
+        <br />
+        <textarea
+          id={FormField.companyDenyList}
+          name={FormField.companyDenyList}
+          rows={4}
+          cols={50}
+          value={options.denyList.companies.join("\n")}
+          onChange={(event) => {
+            setOptions({
+              ...options,
+              denyList: {
+                ...options.denyList,
+                companies: event.target.value.split("\n"),
               },
             });
           }}
