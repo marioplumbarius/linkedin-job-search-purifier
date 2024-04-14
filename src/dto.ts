@@ -21,33 +21,35 @@ export enum JobSetup {
   Hybrid = "Hybrid",
 }
 
-export interface JobCompany {
-  name: string;
-  description: string;
-  followers: string;
-}
-
 export interface JobLocation {
   country: string;
   // country+state+city
   full: string;
 }
 
+export interface JobCompany {
+  name: string;
+  description: string;
+  followers: number;
+  location: JobLocation;
+}
+
+export interface JobExtras {
+  appliesViewsRatio: number;
+}
+
 export interface Job {
   applies: number;
   company: JobCompany;
-  // TODO: descriptions are usually long. What signals do we need from description in form of tags?
   description: string;
-  location: JobLocation;
-  // TODO: ensure description doesn't mention it's a contract with possibility to become full time
+  id: number;
   setup: JobSetup;
-  // TODO: match with 'desired' skills, instead of Linkedin's "all skills" from profile
   skills: string[];
   title: string;
-  // TODO: make sure the description matches this and doesn't call it remote, but it's hybrid
   type: JobType;
-  url: URL;
-  // TODO: compute a metric for applies vs. views. If many people viewed it but didn't apply
-  // that's prob. a red flag or skills are very specific?
+  url: string;
   views: number;
+
+  // this is added by the extension
+  extras: JobExtras;
 }
