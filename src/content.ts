@@ -41,7 +41,11 @@ class ContentScript {
     this.onCurrentJobIdChanged(async (newJobId: number) => {
       console.info(`Job ID changed to ${newJobId}`);
 
-      const job = await this.options.jobStorage.getWithRetry(newJobId, 3, 1);
+      const job = await this.options.jobStorage.getWithRetry(
+        newJobId.toString(),
+        3,
+        1,
+      );
       console.info(`Loaded job: ${job.title}`);
 
       /**

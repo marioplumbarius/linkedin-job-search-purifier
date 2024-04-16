@@ -48,7 +48,7 @@ async function interceptRequest(
     // Stores job posting
     else if (details.url.includes("jobPostings")) {
       const job = joPostingParser.parse(originalDataset);
-      await jobStorage.set(job);
+      await jobStorage.set(job.id.toString(), job);
     }
 
     const encoded = encoder.encode(JSON.stringify(newDataset));
