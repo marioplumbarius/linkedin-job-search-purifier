@@ -1,8 +1,7 @@
-import { Job } from "./dto";
 import { JobStorage } from "./storage";
 import { Unit, getJobIdFromURL } from "./util";
 
-type CurrentJobIdChangedCallback = (newJobId: number) => void;
+type CurrentJobIdChangedCallback = (newJobId: string) => void;
 
 interface ContentScriptOptions {
   intervalCheckJobIdChangedSecs: number;
@@ -14,7 +13,7 @@ interface ContentScriptOptions {
  */
 class ContentScript {
   // used to keep track of what the user is looking at
-  private currentJobId: number | undefined;
+  private currentJobId: string | undefined;
 
   constructor(private readonly options: ContentScriptOptions) {}
 
@@ -38,14 +37,10 @@ class ContentScript {
   init() {
     // Fetch job from storage once user clicks on job title.
     // Assume the background script already stored the job in storage.
-    this.onCurrentJobIdChanged(async (newJobId: number) => {
+    this.onCurrentJobIdChanged(async (newJobId: string) => {
       console.info(`Job ID changed to ${newJobId}`);
 
-      const job = await this.options.jobStorage.getWithRetry(
-        newJobId.toString(),
-        3,
-        1,
-      );
+      const job = await this.options.jobStorage.getWithRetry(newJobId, 3, 1);
       console.info(`Loaded job: ${job.title}`);
 
       /**

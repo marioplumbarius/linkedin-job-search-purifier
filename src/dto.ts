@@ -42,7 +42,7 @@ export interface Job {
   applies: number;
   company: JobCompany;
   description: string;
-  id: number;
+  id: string;
   setup: JobSetup;
   title: string;
   type: JobType;
@@ -54,6 +54,6 @@ export interface Job {
 }
 
 export interface JobSkills {
-  jobId: number;
+  jobId: string;
   skills: string[];
 }

@@ -1,5 +1,4 @@
-export function getJobIdFromURL(): number | undefined {
+export function getJobIdFromURL(): string | undefined {
   const jobId = new URLSearchParams(window.location.search).get("currentJobId");
-  if (jobId) return parseInt(jobId);
-  return undefined;
+  return jobId || undefined;
 }
