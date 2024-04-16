@@ -3,7 +3,7 @@ import { BaseStorage } from "./base";
 import { JobSkills } from "../dto";
 
 export class JobSkillsStorage extends BaseStorage<JobSkills> {
-  constructor() {
-    super("jobSkills", browser.storage.local);
+  constructor(area: browser.Storage.StorageArea) {
+    super("jobSkills", area);
   }
 }

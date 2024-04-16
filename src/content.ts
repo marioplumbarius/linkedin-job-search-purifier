@@ -1,11 +1,13 @@
-import { JobStorage } from "./storage";
+import { JobSkillsStorage, JobStorage } from "./storage";
 import { Unit, getJobIdFromURL } from "./util";
+import browser from "webextension-polyfill";
 
 type CurrentJobIdChangedCallback = (newJobId: string) => void;
 
 interface ContentScriptOptions {
   intervalCheckJobIdChangedSecs: number;
   jobStorage: JobStorage;
+  jobSkillsStorage: JobSkillsStorage;
 }
 
 /**
@@ -42,6 +44,9 @@ class ContentScript {
 
       const job = await this.options.jobStorage.getWithRetry(newJobId, 3, 1);
       console.info(`Loaded job: ${job.title}`);
+
+      const jobSkills = await this.options.jobSkillsStorage.get(newJobId);
+      console.info(`Loaded jobSkills: ${jobSkills?.skills}`);
 
       /**
        * TODO:
@@ -85,5 +90,6 @@ class ContentScript {
 
 new ContentScript({
   intervalCheckJobIdChangedSecs: 1,
-  jobStorage: new JobStorage(),
+  jobStorage: new JobStorage(browser.storage.local),
+  jobSkillsStorage: new JobSkillsStorage(browser.storage.local),
 }).init();
