@@ -9,5 +9,5 @@
     "allowJs": true,
     "moduleResolution": "node"
   },
-  "include": ["src/**/*", "storage.ts"]
+  "include": ["src/**/*"]
 }
