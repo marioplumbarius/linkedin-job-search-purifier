@@ -43,6 +43,7 @@ export abstract class BaseStorage<Item> {
     throw new Error(
       JSON.stringify({
         message: "Unable to fetch item from storage after retries.",
+        namespace: this.namespace,
         id,
         maxAttempts,
         intervalSeconds,

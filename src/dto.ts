@@ -42,14 +42,18 @@ export interface Job {
   applies: number;
   company: JobCompany;
   description: string;
-  id: number;
+  id: string;
   setup: JobSetup;
-  skills: string[];
   title: string;
   type: JobType;
   url: string;
   views: number;
 
-  // this is added by the extension
+  // this is added by this extension
   extras: JobExtras;
+}
+
+export interface JobSkills {
+  jobId: string;
+  skills: string[];
 }

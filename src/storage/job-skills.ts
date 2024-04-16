@@ -1,9 +1,9 @@
 import browser from "webextension-polyfill";
 import { BaseStorage } from "./base";
-import { Job } from "../dto";
+import { JobSkills } from "../dto";
 
-export class JobStorage extends BaseStorage<Job> {
+export class JobSkillsStorage extends BaseStorage<JobSkills> {
   constructor(area: browser.Storage.StorageArea) {
-    super("jobs", area);
+    super("jobSkills", area);
   }
 }
