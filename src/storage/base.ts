@@ -1,40 +1,34 @@
 import browser from "webextension-polyfill";
 
-export type BaseStorageItemID = string | number;
-
-export interface BaseStorageItem {
-  id: BaseStorageItemID;
-}
-
-export abstract class BaseStorage<T extends BaseStorageItem> {
+export abstract class BaseStorage<Item> {
   constructor(
-    private readonly key: string,
+    private readonly namespace: string,
     private readonly area: browser.Storage.StorageArea,
   ) {}
 
   async clear() {
-    await this.area.remove(this.key);
+    await this.area.remove(this.namespace);
   }
 
-  async set(item: T) {
-    const data = await this.area.get(this.key);
-    if (!data[this.key]) data[this.key] = {};
-    data[this.key][item.id] = item;
+  async set(id: string, item: Item) {
+    const data = await this.area.get(this.namespace);
+    if (!data[this.namespace]) data[this.namespace] = {};
+    data[this.namespace][id] = item;
 
     await this.area.set(data);
   }
 
-  async get(id: BaseStorageItemID): Promise<T | undefined> {
-    const data = await this.area.get(this.key);
-    if (!data[this.key]) return undefined;
-    return data[this.key][id];
+  async get(id: string): Promise<Item | undefined> {
+    const data = await this.area.get(this.namespace);
+    if (!data[this.namespace]) return undefined;
+    return data[this.namespace][id];
   }
 
   async getWithRetry(
-    id: BaseStorageItemID,
+    id: string,
     maxAttempts: number,
     intervalSeconds: number,
-  ): Promise<T> {
+  ): Promise<Item> {
     let attempts = 0;
     while (attempts <= maxAttempts) {
       const item = await this.get(id);
