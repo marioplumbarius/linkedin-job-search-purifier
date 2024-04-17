@@ -1,6 +1,18 @@
 import { JobSkills } from "../dto";
 import { LinkedinUrnMapper } from "./urn-mapper";
 
+type ItemsWithSubtitle = {
+  subtitle: string;
+};
+
+type ItemsMatchGroup = {
+  $type: string;
+  items: ItemsWithSubtitle | any[];
+  itemsDescription?: {
+    text: string;
+  };
+};
+
 export interface LinkedinJobSkillsPayload {
   included: {
     $type: string;
@@ -8,12 +20,7 @@ export interface LinkedinJobSkillsPayload {
     howYouMatchSection: {
       itemsMatchSection: {
         $type: string;
-        groups: {
-          $type: string;
-          items: {
-            subtitle: string;
-          };
-        };
+        groups: ItemsMatchGroup[];
       };
     }[];
   }[];
@@ -24,7 +31,7 @@ export class LinkedinJobSkillsParser {
 
   parse(payload: LinkedinJobSkillsPayload): JobSkills {
     let jobId: string | undefined;
-    const skills: string[] = payload.included
+    const groups: ItemsMatchGroup[] = payload.included
       .filter((item) => {
         if (item.$type === "com.linkedin.voyager.dash.jobs.HowYouMatchCard") {
           // resolves the jobId in one go
@@ -48,16 +55,29 @@ export class LinkedinJobSkillsParser {
       .filter(
         (item) =>
           item.$type === "com.linkedin.voyager.dash.jobs.ItemsMatchGroup",
-      )
-      .map((item) => item.items)
-      .flat()
-      // this is where the skills are stored
-      .map((item) => item.subtitle.split(/,| and /))
-      .flat()
+      );
+
+    const itemsSkills: string[] = groups
+      .filter((group) => !Array.isArray(group.items))
+      .map((group) => group.items as ItemsWithSubtitle)
+      .map((item) => {
+        return item!.subtitle.split(/,| and /);
+      })
+      .flat();
+
+    const itemsDescriptionSkills: string[] = groups
+      .filter((group) => group.itemsDescription !== undefined)
+      .map((group) => group.itemsDescription)
+      .map((itemsDescription) => itemsDescription!.text.split(/·/))
+      .flat();
+
+    const skills = itemsSkills
+      .concat(itemsDescriptionSkills)
       // remove whitespaces
       .map((item) => item.trim())
       // remove empty strings
-      .filter((item) => item.length > 0);
+      .filter((item) => item.length > 0)
+      .sort();
 
     return {
       jobId: jobId,
