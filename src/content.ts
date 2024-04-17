@@ -45,7 +45,11 @@ class ContentScript {
       const job = await this.options.jobStorage.getWithRetry(newJobId, 3, 1);
       console.info(`Loaded job: ${job.title}`);
 
-      const jobSkills = await this.options.jobSkillsStorage.get(newJobId);
+      const jobSkills = await this.options.jobSkillsStorage.getWithRetry(
+        newJobId,
+        3,
+        1,
+      );
       console.info(`Loaded jobSkills: ${jobSkills?.skills}`);
 
       /**
@@ -84,7 +88,14 @@ class ContentScript {
     // Clear storage on page refresh/exit.
     // This is needed to avoid storing unlimited number of jobs in storage.
     // Assume Linkedin won't cache job data on refresh/exit.
-    window.addEventListener("beforeunload", this.options.jobStorage.clear);
+    window.addEventListener(
+      "beforeunload",
+      async () => await this.options.jobStorage.clear(),
+    );
+    window.addEventListener(
+      "beforeunload",
+      async () => await this.options.jobSkillsStorage.clear(),
+    );
   }
 }
 
