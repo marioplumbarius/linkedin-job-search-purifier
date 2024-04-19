@@ -45,5 +45,8 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "dependencies": {
+    "@langchain/google-genai": "^0.0.11"
   }
 }
