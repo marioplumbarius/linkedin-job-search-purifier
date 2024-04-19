@@ -32,7 +32,6 @@ module.exports = {
   mode: "none",
   devtool: "inline-source-map",
   plugins: [
-    // TODO: find out why process is undefined and remove the plugin below
     new webpack.DefinePlugin({ process: { env: {} } }),
     new HtmlWebpackPlugin({
       chunks: ["options"],

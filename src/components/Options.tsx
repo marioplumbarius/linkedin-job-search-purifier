@@ -7,6 +7,7 @@ import { DefaultExtensionOptions, ExtensionOptions } from "../dto";
 enum FormField {
   titleDenyList = "titleDenyList",
   companyDenyList = "companyDenyList",
+  googleApiKey = "googleApiKey",
 }
 
 export default function Options() {
@@ -66,6 +67,7 @@ export default function Options() {
         />
 
         <br />
+        <br />
 
         <label>Companies to Exclude (regexp)</label>
         <br />
@@ -88,6 +90,25 @@ export default function Options() {
           }}
         />
 
+        <br />
+        <br />
+
+        <label>Google API Key</label>
+        <br />
+        <input
+          id={FormField.googleApiKey}
+          name={FormField.googleApiKey}
+          value={options.googleApiKey}
+          type="password"
+          onChange={(event) => {
+            setOptions({
+              ...options,
+              googleApiKey: event.target.value,
+            });
+          }}
+        />
+
+        <br />
         <br />
 
         <Button variant="contained" color="primary" type="submit">

@@ -1,3 +1,4 @@
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import browser from "webextension-polyfill";
 import { LinkedinDatasetFilterer, LinkedinUrnMapper } from "./linkedin";
 import { DefaultExtensionOptions } from "./dto";
@@ -6,12 +7,14 @@ import { JobExtrasStorage, JobSkillsStorage, JobStorage } from "./storage";
 import { LinkedinJobSkillsParser } from "./linkedin/job-skills-parser";
 import { OptionsStorage } from "./storage/options";
 import { stringToRegExp } from "./util";
+import { JobExtrasAIFacade } from "./ai";
 
 interface BackgroundScriptOptions {
   areaStorage: browser.Storage.StorageArea;
   decoder: TextDecoder;
   encoder: TextEncoder;
   optionsStorage: OptionsStorage;
+  jobExtrasAIFacade: JobExtrasAIFacade;
   jobExtrasStorage: JobExtrasStorage;
   jobSkillsParser: LinkedinJobSkillsParser;
   jobSkillsStorage: JobSkillsStorage;
@@ -65,6 +68,13 @@ class BackgroundScript {
         // Stores job posting
         const job = this.options.joPostingParser.parse(originalDataset);
         await this.options.jobStorage.set(job.id, job);
+
+        // Fetch and store job extras
+        // Not blocking the execution with await, because this request might take
+        // a while to complete.
+        this.options.jobExtrasAIFacade
+          .predict(job)
+          .then((extras) => this.options.jobExtrasStorage.set(job.id, extras));
       } else if (details.url.includes("HOW_YOU_MATCH_CARD")) {
         // Stores job skills
         const jobSkills = this.options.jobSkillsParser.parse(originalDataset);
@@ -101,12 +111,22 @@ class BackgroundScript {
   const areaStorage = browser.storage.local;
   const optionsStorage = new OptionsStorage(areaStorage);
   const extensionOptions =
-    (await optionsStorage.get("denyList")) || DefaultExtensionOptions;
+    (await optionsStorage.get()) || DefaultExtensionOptions;
   new BackgroundScript({
     areaStorage: browser.storage.local,
     decoder: new TextDecoder("utf-8"),
     encoder: new TextEncoder(),
     optionsStorage: optionsStorage,
+    jobExtrasAIFacade: new JobExtrasAIFacade({
+      models: {
+        gemini: new ChatGoogleGenerativeAI({
+          apiKey: extensionOptions.googleApiKey,
+          temperature: 0,
+          model: "gemini-pro",
+          maxOutputTokens: 3,
+        }),
+      },
+    }),
     jobExtrasStorage: new JobExtrasStorage(areaStorage),
     jobSkillsParser: new LinkedinJobSkillsParser(linkedinUrnMapper),
     jobSkillsStorage: new JobSkillsStorage(areaStorage),

@@ -53,6 +53,13 @@ class ContentScript {
       );
       console.info(`Loaded jobSkills: ${jobSkills?.skills}`);
 
+      const jobExtras = await this.options.jobExtrasStorage.getWithRetry(
+        newJobId,
+        3,
+        1,
+      );
+      console.info(`Loaded jobExtras: ${JSON.stringify(jobExtras)}`);
+
       /**
        * TODO:
        * 1. Integrate with AI (remotely)
@@ -96,6 +103,10 @@ class ContentScript {
     window.addEventListener(
       "beforeunload",
       async () => await this.options.jobSkillsStorage.clear(),
+    );
+    window.addEventListener(
+      "beforeunload",
+      async () => await this.options.jobExtrasStorage.clear(),
     );
   }
 }

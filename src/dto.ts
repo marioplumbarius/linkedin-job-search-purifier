@@ -3,10 +3,12 @@ export interface ExtensionOptions {
     titles: string[];
     companies: string[];
   };
+  googleApiKey: string;
 }
 
 export const DefaultExtensionOptions: ExtensionOptions = {
   denyList: { titles: [], companies: [] },
+  googleApiKey: "",
 };
 
 export enum JobType {

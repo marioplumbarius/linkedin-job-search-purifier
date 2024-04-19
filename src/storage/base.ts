@@ -18,10 +18,11 @@ export abstract class BaseStorage<Item> {
     await this.area.set(data);
   }
 
-  async get(id: string): Promise<Item | undefined> {
+  async get(id?: string): Promise<Item | undefined> {
     const data = await this.area.get(this.namespace);
     if (!data[this.namespace]) return undefined;
-    return data[this.namespace][id];
+    if (id) return data[this.namespace][id];
+    else return data[this.namespace];
   }
 
   async getWithRetry(
