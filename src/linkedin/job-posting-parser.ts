@@ -42,9 +42,6 @@ export class LinkedinJobPostingParser {
       type: data.formattedEmploymentStatus as JobType,
       url: data.jobPostingUrl,
       views: data.views,
-      extras: {
-        appliesViewsRatio: Math.round((data.applies / data.views) * 100),
-      },
     } as Job;
   }
 }

@@ -2,7 +2,7 @@ import browser from "webextension-polyfill";
 import { LinkedinDatasetFilterer, LinkedinUrnMapper } from "./linkedin";
 import { DefaultExtensionOptions } from "./dto";
 import { LinkedinJobPostingParser } from "./linkedin/job-posting-parser";
-import { JobSkillsStorage, JobStorage } from "./storage";
+import { JobExtrasStorage, JobSkillsStorage, JobStorage } from "./storage";
 import { LinkedinJobSkillsParser } from "./linkedin/job-skills-parser";
 import { OptionsStorage } from "./storage/options";
 import { stringToRegExp } from "./util";
@@ -12,6 +12,7 @@ interface BackgroundScriptOptions {
   decoder: TextDecoder;
   encoder: TextEncoder;
   optionsStorage: OptionsStorage;
+  jobExtrasStorage: JobExtrasStorage;
   jobSkillsParser: LinkedinJobSkillsParser;
   jobSkillsStorage: JobSkillsStorage;
   jobStorage: JobStorage;
@@ -106,6 +107,7 @@ class BackgroundScript {
     decoder: new TextDecoder("utf-8"),
     encoder: new TextEncoder(),
     optionsStorage: optionsStorage,
+    jobExtrasStorage: new JobExtrasStorage(areaStorage),
     jobSkillsParser: new LinkedinJobSkillsParser(linkedinUrnMapper),
     jobSkillsStorage: new JobSkillsStorage(areaStorage),
     jobStorage: new JobStorage(areaStorage),
