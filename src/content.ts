@@ -1,4 +1,4 @@
-import { JobSkillsStorage, JobStorage } from "./storage";
+import { JobExtrasStorage, JobSkillsStorage, JobStorage } from "./storage";
 import { Unit, getJobIdFromURL } from "./util";
 import browser from "webextension-polyfill";
 
@@ -6,6 +6,7 @@ type CurrentJobIdChangedCallback = (newJobId: string) => void;
 
 interface ContentScriptOptions {
   intervalCheckJobIdChangedSecs: number;
+  jobExtrasStorage: JobExtrasStorage;
   jobStorage: JobStorage;
   jobSkillsStorage: JobSkillsStorage;
 }
@@ -101,6 +102,7 @@ class ContentScript {
 
 new ContentScript({
   intervalCheckJobIdChangedSecs: 1,
+  jobExtrasStorage: new JobExtrasStorage(browser.storage.local),
   jobStorage: new JobStorage(browser.storage.local),
   jobSkillsStorage: new JobSkillsStorage(browser.storage.local),
 }).init();

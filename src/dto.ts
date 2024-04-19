@@ -34,10 +34,6 @@ export interface JobCompany {
   location: JobLocation;
 }
 
-export interface JobExtras {
-  appliesViewsRatio: number;
-}
-
 export interface Job {
   applies: number;
   company: JobCompany;
@@ -48,12 +44,14 @@ export interface Job {
   type: JobType;
   url: string;
   views: number;
-
-  // this is added by this extension
-  extras: JobExtras;
 }
 
 export interface JobSkills {
   jobId: string;
   skills: string[];
+}
+
+export interface JobExtras {
+  jobId: string;
+  prOrCitizenshipRequired: boolean;
 }
