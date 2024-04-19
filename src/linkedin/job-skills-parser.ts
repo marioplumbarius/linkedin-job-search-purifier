@@ -1,13 +1,9 @@
 import { JobSkills } from "../dto";
 import { LinkedinUrnMapper } from "./urn-mapper";
 
-type ItemsWithSubtitle = {
-  subtitle: string;
-};
-
 type ItemsMatchGroup = {
   $type: string;
-  items: ItemsWithSubtitle | any[];
+  items: { subtitle: string }[];
   itemsDescription?: {
     text: string;
   };
@@ -58,15 +54,16 @@ export class LinkedinJobSkillsParser {
       );
 
     const itemsSkills: string[] = groups
-      .filter((group) => !Array.isArray(group.items))
-      .map((group) => group.items as ItemsWithSubtitle)
+      .filter((group) => group.items.length > 0)
+      .map((group) => group.items)
+      .flat()
       .map((item) => {
         return item!.subtitle.split(/,| and /);
       })
       .flat();
 
     const itemsDescriptionSkills: string[] = groups
-      .filter((group) => group.itemsDescription !== undefined)
+      .filter((group) => group.itemsDescription)
       .map((group) => group.itemsDescription)
       .map((itemsDescription) => itemsDescription!.text.split(/·/))
       .flat();
