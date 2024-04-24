@@ -12,7 +12,7 @@ Skip to the [development](#development) section to install it.
 
 - **Filter Out Unwanted Companies:** Linkedin allows you to filter by company, but it doesn't let you block companies. This extension allows you to filter out job search results by providing a regexp of companies to block. It is temporary and you can unblock companies at any time.
 - **Filter Out Unwanted Job Titles:** You might also want to search for a particular role, such as `Software Engineer`, but you don't want to see results for `.NET Software Engineer`, because you do not program in `.NET`, but you do in many other languages. Same for when it returns `Full-stack` roles, but you're not interested in `Frontend` development. This extension let's you filter out job titles using regexp, which allows to remove those unwanted roles from your search results.
-- **Quickly identify whether PR/Citizen-only roles:** Linkedin do not display whether roles require citizenship or permanent residency. That makes applicants that do not meet those pre-condition waste time reading the entire job posting, to only then realize they are not eligigle. This extension uses AI to read the job posting and let you know within seconds whether it requires PR/Citizenship or not.
+- **Quickly identify PR/Citizen-only roles:** Linkedin do not highlight whether roles require citizenship or permanent residency. That makes applicants that do not meet those pre-condition waste time reading the entire job posting, to only then realize they are not eligible to apply. This extension uses AI to read the job posting and let you know within seconds whether it requires PR/Citizenship or not.
 
 ### What's Next
 
