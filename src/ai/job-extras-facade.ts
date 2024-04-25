@@ -1,4 +1,4 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatGoogleGenerativeAI, BaseMessage } from "@langchain/google-genai";
 import { Job, JobExtras } from "../dto";
 
 export interface JobExtrasAIFacadeOptions {
@@ -33,11 +33,11 @@ export class JobExtrasAIFacade {
 
   // TODO: find a better way to convert response indices to the prompt order
   // Right now, it assumes the response comes in the order of the questions
-  private parseResponseContent(job: Job, content: string): JobExtras {
+  private parseResponse(job: Job, response: BaseMessage): JobExtras {
     // Example: "1. no\n2. yes"
-    const answers = content
+    const answers = response.content
       .split("\n")
-      .map((answer) => answer.split(" ")[1].toLowerCase() === "yes");
+      .map((answer: string) => answer.split(" ")[1].toLowerCase() === "yes");
 
     return {
       jobId: job.id,
@@ -49,6 +49,6 @@ export class JobExtrasAIFacade {
   async predict(job: Job): Promise<JobExtras> {
     const prompt = this.buildPrompt(job.description);
     const response = await this.options.models.gemini.invoke(prompt);
-    return this.parseResponseContent(job, response.content as string);
+    return this.parseResponse(job, response);
   }
 }
