@@ -66,7 +66,10 @@ class ContentScript {
           </div>
         </div>
       </div>
-      <span>PR/Citizen-only: ${jobExtras.prOrCitizenshipRequired}</span>`;
+      <span>
+        PR/Citizen-only: ${jobExtras.prOrCitizenshipRequired},
+        Visa Sponsorship Provided: ${jobExtras.visaSponsorshipProvided}
+      </span>`;
 
     // If element is already present, replace it. Otherwise, add it.
     const $existingElement = document.getElementById(elementId);
