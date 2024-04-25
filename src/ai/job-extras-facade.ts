@@ -49,9 +49,6 @@ export class JobExtrasAIFacade {
   async predict(job: Job): Promise<JobExtras> {
     const prompt = this.buildPrompt(job.description);
     const response = await this.options.models.gemini.invoke(prompt);
-
-    console.debug(response.content);
-
     return this.parseResponseContent(job, response.content as string);
   }
 }
