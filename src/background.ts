@@ -123,7 +123,6 @@ class BackgroundScript {
           apiKey: extensionOptions.googleApiKey,
           temperature: 0,
           model: "gemini-pro",
-          maxOutputTokens: 3,
         }),
       },
     }),
