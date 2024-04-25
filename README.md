@@ -6,7 +6,7 @@ Firefox extension to enhance Linkedin's Job Search Results UX by purifying it wi
 
 ## Install It
 
-Skip to the [development](#development) section to install it.
+Skip to the [contributing](#contributing) section to install it.
 
 ## Use Cases
 
