@@ -1,4 +1,5 @@
-import { ChatGoogleGenerativeAI, BaseMessage } from "@langchain/google-genai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { BaseMessage } from "@langchain/core/messages";
 import { Job, JobExtras } from "../dto";
 
 export interface JobExtrasAIFacadeOptions {
@@ -35,7 +36,8 @@ export class JobExtrasAIFacade {
   // Right now, it assumes the response comes in the order of the questions
   private parseResponse(job: Job, response: BaseMessage): JobExtras {
     // Example: "1. no\n2. yes"
-    const answers = response.content
+    const content = response.content as string;
+    const answers = content
       .split("\n")
       .map((answer: string) => answer.split(" ")[1].toLowerCase() === "yes");
 
