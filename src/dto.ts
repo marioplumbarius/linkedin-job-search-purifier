@@ -48,9 +48,11 @@ export interface Job {
   views: number;
 }
 
+// TODO: rename JobSkills to JobQualifications
 export interface JobSkills {
   jobId: string;
   skills: string[];
+  requirements: string[];
 }
 
 export interface JobExtras {

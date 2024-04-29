@@ -9,6 +9,18 @@ type ItemsMatchGroup = {
   };
 };
 
+type QualificationMatchGroup = {
+  $type: string;
+  qualification: {
+    qualificationList: {
+      $type: string;
+      qualifications: string[];
+    };
+  };
+};
+
+type MatchGroup = ItemsMatchGroup | QualificationMatchGroup;
+
 export interface LinkedinJobSkillsPayload {
   included: {
     $type: string;
@@ -17,7 +29,11 @@ export interface LinkedinJobSkillsPayload {
       itemsMatchSection: {
         $type: string;
         groups: ItemsMatchGroup[];
-      };
+      } | null;
+      qualificationSection: {
+        $type: string;
+        groups: QualificationMatchGroup[];
+      } | null;
     }[];
   }[];
 }
@@ -27,7 +43,8 @@ export class LinkedinJobSkillsParser {
 
   parse(payload: LinkedinJobSkillsPayload): JobSkills {
     let jobId: string | undefined;
-    const groups: ItemsMatchGroup[] = payload.included
+
+    const sections = payload.included
       .filter((item) => {
         if (item.$type === "com.linkedin.voyager.dash.jobs.HowYouMatchCard") {
           // resolves the jobId in one go
@@ -38,22 +55,36 @@ export class LinkedinJobSkillsParser {
         return false;
       })
       .map((item) => item.howYouMatchSection)
-      .flat()
-      .filter((item) => item !== undefined)
-      .filter(
-        (item) =>
-          item.itemsMatchSection &&
-          item.itemsMatchSection.$type ===
-            "com.linkedin.voyager.dash.jobs.ItemsMatchSection",
-      )
-      .map((item) => item.itemsMatchSection.groups)
-      .flat()
-      .filter(
-        (item) =>
-          item.$type === "com.linkedin.voyager.dash.jobs.ItemsMatchGroup",
-      );
+      .flat();
 
-    const itemsSkills: string[] = groups
+    const qualifications = sections
+      .filter(
+        (section) =>
+          section.qualificationSection != null &&
+          section.qualificationSection.$type ===
+            "com.linkedin.voyager.dash.jobs.JobQualificationSection",
+      )
+      .map((section) => section.qualificationSection!.groups)
+      .flat()
+      .filter(
+        (group) =>
+          group.$type ===
+          "com.linkedin.voyager.dash.jobs.JobQualificationGroup",
+      )
+      .filter(
+        (group) =>
+          group.qualification.qualificationList.$type ===
+          "com.linkedin.voyager.dash.jobs.JobQualificationList",
+      )
+      .map((group) => group.qualification.qualificationList.qualifications)
+      .flat();
+
+    const itemsGroups = sections
+      .filter((section) => section.itemsMatchSection != null)
+      .map((section) => section.itemsMatchSection!.groups)
+      .flat();
+
+    const itemsSkills: string[] = itemsGroups
       .filter((group) => group.items.length > 0)
       .map((group) => group.items)
       .flat()
@@ -62,7 +93,7 @@ export class LinkedinJobSkillsParser {
       })
       .flat();
 
-    const itemsDescriptionSkills: string[] = groups
+    const itemsDescriptionSkills: string[] = itemsGroups
       .filter((group) => group.itemsDescription)
       .map((group) => group.itemsDescription)
       .map((itemsDescription) => itemsDescription!.text.split(/·/))
@@ -78,6 +109,8 @@ export class LinkedinJobSkillsParser {
 
     return {
       jobId: jobId,
+      // Linkedin store as qualifications, but display as requirements.
+      requirements: qualifications,
       skills,
     } as JobSkills;
   }
