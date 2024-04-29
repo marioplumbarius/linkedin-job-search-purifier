@@ -1,4 +1,4 @@
-import { JobSkills } from "../dto";
+import { JobQualifications } from "../dto";
 import { LinkedinUrnMapper } from "./urn-mapper";
 
 type ItemsMatchGroup = {
@@ -19,8 +19,6 @@ type QualificationMatchGroup = {
   };
 };
 
-type MatchGroup = ItemsMatchGroup | QualificationMatchGroup;
-
 export interface LinkedinJobSkillsPayload {
   included: {
     $type: string;
@@ -38,10 +36,10 @@ export interface LinkedinJobSkillsPayload {
   }[];
 }
 
-export class LinkedinJobSkillsParser {
+export class LinkedinJobQualificationsParser {
   constructor(private readonly urnMapper: LinkedinUrnMapper) {}
 
-  parse(payload: LinkedinJobSkillsPayload): JobSkills {
+  parse(payload: LinkedinJobSkillsPayload): JobQualifications {
     let jobId: string | undefined;
 
     const sections = payload.included
@@ -112,6 +110,6 @@ export class LinkedinJobSkillsParser {
       // Linkedin store as qualifications, but display as requirements.
       requirements: qualifications,
       skills,
-    } as JobSkills;
+    } as JobQualifications;
   }
 }
