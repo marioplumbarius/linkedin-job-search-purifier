@@ -48,9 +48,10 @@ export interface Job {
   views: number;
 }
 
-export interface JobSkills {
+export interface JobQualifications {
   jobId: string;
   skills: string[];
+  requirements: string[];
 }
 
 export interface JobExtras {

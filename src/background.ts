@@ -1,10 +1,14 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import browser from "webextension-polyfill";
 import { LinkedinDatasetFilterer, LinkedinUrnMapper } from "./linkedin";
-import { DefaultExtensionOptions } from "./dto";
+import { DefaultExtensionOptions, JobQualifications } from "./dto";
 import { LinkedinJobPostingParser } from "./linkedin/job-posting-parser";
-import { JobExtrasStorage, JobSkillsStorage, JobStorage } from "./storage";
-import { LinkedinJobSkillsParser } from "./linkedin/job-skills-parser";
+import {
+  JobExtrasStorage,
+  JobQualificationsStorage,
+  JobStorage,
+} from "./storage";
+import { LinkedinJobQualificationsParser } from "./linkedin/job-qualifications-parser";
 import { OptionsStorage } from "./storage/options";
 import { stringToRegExp } from "./util";
 import { JobExtrasAIFacade } from "./ai";
@@ -16,8 +20,8 @@ interface BackgroundScriptOptions {
   optionsStorage: OptionsStorage;
   jobExtrasAIFacade: JobExtrasAIFacade;
   jobExtrasStorage: JobExtrasStorage;
-  jobSkillsParser: LinkedinJobSkillsParser;
-  jobSkillsStorage: JobSkillsStorage;
+  jobQualificationsParser: LinkedinJobQualificationsParser;
+  jobQualificationsStorage: JobQualificationsStorage;
   jobStorage: JobStorage;
   joPostingParser: LinkedinJobPostingParser;
   linkedinDatasetFilterer: LinkedinDatasetFilterer;
@@ -77,8 +81,12 @@ class BackgroundScript {
           .then((extras) => this.options.jobExtrasStorage.set(job.id, extras));
       } else if (details.url.includes("HOW_YOU_MATCH_CARD")) {
         // Stores job skills
-        const jobSkills = this.options.jobSkillsParser.parse(originalDataset);
-        await this.options.jobSkillsStorage.set(jobSkills.jobId, jobSkills);
+        const jobQualifications =
+          this.options.jobQualificationsParser.parse(originalDataset);
+        await this.options.jobQualificationsStorage.set(
+          jobQualifications.jobId,
+          jobQualifications,
+        );
       }
 
       const encoded = this.options.encoder.encode(JSON.stringify(newDataset));
@@ -127,8 +135,10 @@ class BackgroundScript {
       },
     }),
     jobExtrasStorage: new JobExtrasStorage(areaStorage),
-    jobSkillsParser: new LinkedinJobSkillsParser(linkedinUrnMapper),
-    jobSkillsStorage: new JobSkillsStorage(areaStorage),
+    jobQualificationsParser: new LinkedinJobQualificationsParser(
+      linkedinUrnMapper,
+    ),
+    jobQualificationsStorage: new JobQualificationsStorage(areaStorage),
     jobStorage: new JobStorage(areaStorage),
     joPostingParser: new LinkedinJobPostingParser(),
     linkedinDatasetFilterer: new LinkedinDatasetFilterer(

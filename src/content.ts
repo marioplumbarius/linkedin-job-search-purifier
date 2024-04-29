@@ -1,5 +1,9 @@
 import { JobExtras } from "./dto";
-import { JobExtrasStorage, JobSkillsStorage, JobStorage } from "./storage";
+import {
+  JobExtrasStorage,
+  JobQualificationsStorage,
+  JobStorage,
+} from "./storage";
 import { Unit, getJobIdFromURL } from "./util";
 import browser from "webextension-polyfill";
 
@@ -9,7 +13,7 @@ interface ContentScriptOptions {
   intervalCheckJobIdChangedSecs: number;
   jobExtrasStorage: JobExtrasStorage;
   jobStorage: JobStorage;
-  jobSkillsStorage: JobSkillsStorage;
+  jobQualificationsStorage: JobQualificationsStorage;
 }
 
 /**
@@ -87,47 +91,20 @@ class ContentScript {
       const job = await this.options.jobStorage.getWithRetry(newJobId, 3, 1);
       console.info(`Loaded job: ${job.title}`);
 
-      const jobSkills = await this.options.jobSkillsStorage.getWithRetry(
-        newJobId,
-        3,
-        1,
+      const jobQualifications =
+        await this.options.jobQualificationsStorage.getWithRetry(
+          newJobId,
+          3,
+          1,
+        );
+      console.info(`Loaded jobSkills: ${jobQualifications?.skills}`);
+      console.info(
+        `Loaded jobRequirements: ${jobQualifications?.requirements}`,
       );
-      console.info(`Loaded jobSkills: ${jobSkills?.skills}`);
 
       await this.options.jobExtrasStorage
         .getWithRetry(newJobId, 3, 1)
         .then((jobExtras) => this.renderJobExtras(jobExtras));
-
-      /**
-       * TODO:
-       * 1. Integrate with AI (remotely)
-       *  - Results may vary across models (Gemini vs. GPT-3.5 vs. Claude, etc.)
-       *  - Start with single model, then, let user decide which model to use
-       *  - Questions:
-       *    - Is this job for visa-sponsored?
-       *    - Is this job for non-visa-sponsored?
-       *  - Rating
-       *    - Goal is to rate the job as go/maybe/no-go
-       * 1.1. Ensure Description match search filters
-       *  - ensure description doesn't mention it's a contract with possibility to become full time
-       * For example: remote vs. hybrid. Full-time vs. "contract initially".
-       * 2. Options UI modifications
-       *  - Let user provide API key
-       * 3. Storage
-       *  - Create separate storage for AI responses; use job id as hash key
-       * 4. Linkedin UI
-       *  - Add info to DOM
-       *  - For example, "citizen-only: bool", "no-visa-sponsorship: bool"
-       * 5. Match desired skills, not ALL skills
-       *  - Linkedin looks at all skills from user profile to find matches to job roles
-       * I worked as a FE at the beginning of my career, and while I have that as a skill, I'd
-       * rather work as a backend nowadays. Provide an option for the user to pick desired skills,
-       * and add a new entry to the UI to tell the user how many desired skills matches the current
-       * job posting.
-       * 6. Views vs. Applies Metric
-       * - compute a metric for applies vs. views. If many people viewed it but didn't apply that's
-       * prob. a red flag or skills are very specific?
-       */
     });
 
     // Clear storage on page refresh/exit.
@@ -139,7 +116,7 @@ class ContentScript {
     );
     window.addEventListener(
       "beforeunload",
-      async () => await this.options.jobSkillsStorage.clear(),
+      async () => await this.options.jobQualificationsStorage.clear(),
     );
     window.addEventListener(
       "beforeunload",
@@ -153,5 +130,5 @@ new ContentScript({
   intervalCheckJobIdChangedSecs: 1,
   jobExtrasStorage: new JobExtrasStorage(areaStorage),
   jobStorage: new JobStorage(areaStorage),
-  jobSkillsStorage: new JobSkillsStorage(areaStorage),
+  jobQualificationsStorage: new JobQualificationsStorage(areaStorage),
 }).init();
