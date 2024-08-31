@@ -80,13 +80,16 @@ class BackgroundScript {
           .predict(job)
           .then((extras) => this.options.jobExtrasStorage.set(job.id, extras));
       } else if (details.url.includes("HOW_YOU_MATCH_CARD")) {
-        // Stores job skills
+        // Stores job qualifications
         const jobQualifications =
           this.options.jobQualificationsParser.parse(originalDataset);
         await this.options.jobQualificationsStorage.set(
           jobQualifications.jobId,
           jobQualifications,
         );
+
+        // TODO: refactor trigger for extras to optimize number of calls to LLMs
+        // Ideally, it should be triggered once, only when all data is available.
       }
 
       const encoded = this.options.encoder.encode(JSON.stringify(newDataset));
