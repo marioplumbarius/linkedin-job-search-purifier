@@ -56,6 +56,6 @@ export interface JobQualifications {
 
 export interface JobExtras {
   jobId: string;
-  prOrCitizenshipRequired: boolean;
-  visaSponsorshipProvided: boolean;
+  prOrCitizenshipRequired: string;
+  visaSponsorshipProvided: string;
 }

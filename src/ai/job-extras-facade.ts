@@ -13,7 +13,7 @@ const JOB_DESCRIPTION_MARKER = "{{jobDescription}}";
 enum PromptTemplate {
   DEFAULT = `
     You are a helpful job search assistant.
-    I will provide a job description and questions, and you should answer with yes/no, nothing else.
+    I will provide a job description and questions. You should answer with 'yes' or 'no' if the information is found in the job description, or 'unsure' otherwise. Nothing else!
 
     Job Description: ${JOB_DESCRIPTION_MARKER}
 
@@ -37,9 +37,7 @@ export class JobExtrasAIFacade {
   private parseResponse(job: Job, response: BaseMessage): JobExtras {
     // Example: "1. no\n2. yes"
     const content = response.content as string;
-    const answers = content
-      .split("\n")
-      .map((answer: string) => answer.split(" ")[1].toLowerCase() === "yes");
+    const answers = content.split("\n");
 
     return {
       jobId: job.id,
