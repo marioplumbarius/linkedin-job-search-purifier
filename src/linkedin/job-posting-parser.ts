@@ -25,9 +25,9 @@ export class LinkedinJobPostingParser {
       else if (item.$type === "com.linkedin.voyager.organization.Company") {
         company.name = item.name;
         company.description = item.description;
-        company.location.country = this.regionNamesInEnglish.of(
-          item.headquarter.country,
-        )!;
+        company.location.country = item.headquarter
+          ? this.regionNamesInEnglish.of(item.headquarter.country)!
+          : "";
       } else if (item.$type === "com.linkedin.voyager.common.FollowingInfo")
         company.followers = item.followerCount;
     });
